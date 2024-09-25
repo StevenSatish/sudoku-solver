@@ -1,6 +1,6 @@
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   Drawer,
   ListItemButton,
@@ -14,13 +14,19 @@ function SideNav({ children }) {
   const changePage = (page) => {
     switch (page) {
       case 1:
-        window.location.href = "/home";
+        if (window.location.pathname !== "/home") {
+          window.location.href = "/home";
+        }
         break;
       case 2:
-        window.location.href = "/solver";
+        if (window.location.pathname !== "/solver") {
+          window.location.href = "/solver";
+        }
         break;
       case 3:
-        window.location.href = "/about";
+        if (window.location.pathname !== "/about") {
+          window.location.href = "/about";
+        }
         break;
       default:
         window.location.href = "/";
@@ -58,7 +64,7 @@ function SideNav({ children }) {
           </ListItem>
         </List>
       </Drawer>
-      <main style={{ flexGrow: 1, marginLeft: `30 px` }}>{children}</main>
+      <main style={{ flexGrow: 1 }}>{children}</main>
     </div>
   );
 }
