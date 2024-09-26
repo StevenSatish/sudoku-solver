@@ -1,6 +1,5 @@
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import { useLocation } from "react-router-dom";
 import {
   Drawer,
   ListItemButton,
@@ -14,8 +13,8 @@ function SideNav({ children }) {
   const changePage = (page) => {
     switch (page) {
       case 1:
-        if (window.location.pathname !== "/home") {
-          window.location.href = "/home";
+        if (window.location.pathname !== "/play") {
+          window.location.href = "/play";
         }
         break;
       case 2:
