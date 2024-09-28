@@ -1,18 +1,22 @@
-const SudokuCell = () => {
+import "./SudokuStyles.css";
+
+function SudokuCell({ cellKey, selectedCell, handleCellClick, value }) {
+  // Check if this cell is the selected one
+  const isSelected = selectedCell === cellKey;
+
+  const cellStyle = {
+    backgroundColor: isSelected ? "#ADD8E6" : "white", // Highlight if selected
+  };
+
   return (
     <div
-      style={{
-        border: "1px solid #000", // border for individual cells
-        textAlign: "center",
-        fontSize: "30px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      className={"sudoku-cell"}
+      style={cellStyle}
+      onClick={() => handleCellClick(cellKey)} // Handle click to select the cell
     >
-      {"X"}
+      {value || ""} {/* Display the value of the cell */}
     </div>
   );
-};
+}
 
 export default SudokuCell;
