@@ -5,7 +5,7 @@ import SudokuSquare from "./SudokuSquare";
 const SudokuBoard = ({ puzzle }) => {
   const [selectedCell, setSelectedCell] = useState(null);
   const [board, setBoard] = useState(
-    Array.from({ length: 9 }, () => Array(9).fill("")), // Default to a 9x9 empty array
+    Array.from({ length: 9 }, () => Array(9).fill("")),
   );
 
   // Update board when puzzle changes
@@ -30,12 +30,12 @@ const SudokuBoard = ({ puzzle }) => {
       if (/^[1-9]$/.test(event.key)) {
         const newBoard = [...board];
         newBoard[rowIndex] = [...newBoard[rowIndex]]; // Create a copy of the row
-        newBoard[rowIndex][colIndex] = event.key; // Set the new value
+        newBoard[rowIndex][colIndex] = parseInt(event.key); // Set the new value
         setBoard(newBoard); // Update the board state
       } else if (event.key === "Backspace" || event.key === "Delete") {
         const newBoard = [...board];
         newBoard[rowIndex] = [...newBoard[rowIndex]]; // Create a copy of the row
-        newBoard[rowIndex][colIndex] = ""; // Clear the value
+        newBoard[rowIndex][colIndex] = 0; // Clear the value
         setBoard(newBoard); // Update the board state
       }
     }
