@@ -1,9 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./SudokuStyles.css";
 import SudokuSquare from "./SudokuSquare";
 
-const SudokuBoard = () => {
+const SudokuBoard = ({ puzzle }) => {
   const [selectedCell, setSelectedCell] = useState(null);
+  const [board, setBoard] = useState(
+    Array.from({ length: 9 }, () => Array(9).fill("")), // Default to a 9x9 empty array
+  );
+
+  // Update board when puzzle changes
+  useEffect(() => {
+    if (
+      Array.isArray(puzzle) &&
+      puzzle.length === 9 &&
+      puzzle.every((row) => Array.isArray(row) && row.length === 9)
+    ) {
+      setBoard(puzzle); // Update board if puzzle is valid
+    }
+  }, [puzzle]);
+
   //highlight and select a cell when clicked
   const handleCellClick = (cellIndex) => {
     setSelectedCell(cellIndex);
@@ -25,8 +40,7 @@ const SudokuBoard = () => {
       }
     }
   };
-  //board representing all cells
-  const [board, setBoard] = useState(Array(9).fill(Array(9).fill("")));
+
   return (
     <div tabIndex={0} className={"sudoku-board"} onKeyDown={handleKeyDown}>
       {board.map((square, squareIndex) => (
