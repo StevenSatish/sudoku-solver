@@ -1,18 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import SudokuCell from "./SudokuCell";
 import "./SudokuStyles.css";
 
-const SudokuSquare = ({
-  squareIndex,
-  handleCellClick,
-  selectedCell,
-  board,
-}) => {
-  const square = board[squareIndex];
+const SudokuRow = ({ rowIndex, handleCellClick, selectedCell, board }) => {
+  const row = board[rowIndex];
   return (
-    <div className={"sudoku-square"}>
-      {square.map((cell, cellIndex) => {
-        const cellKey = squareIndex * 9 + cellIndex; // unique key for each cell
+    <div className={"sudoku-row"}>
+      {row.map((cell, cellIndex) => {
+        const cellKey = rowIndex * 9 + cellIndex; // unique key for each cell
         return (
           <SudokuCell
             key={cellKey}
@@ -26,4 +21,4 @@ const SudokuSquare = ({
     </div>
   );
 };
-export default SudokuSquare;
+export default SudokuRow;

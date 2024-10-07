@@ -27,7 +27,6 @@ function Play() {
       }
       console.log("Fetching puzzle...");
       const puzzleData = await response.json(); // The puzzle is a 2D array (int[][])
-      console.log("Puzzle fetched:", puzzleData);
       setPuzzle(puzzleData); // Set the puzzle state
     } catch (error) {
       console.error("Error:", error);

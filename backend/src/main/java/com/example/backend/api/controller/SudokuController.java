@@ -2,6 +2,7 @@ package com.example.backend.api.controller;
 
 import com.example.backend.service.SudokuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,7 +25,20 @@ public class SudokuController {
 
     // Endpoint to solve a given Sudoku puzzle
     @PostMapping("/solve")
-    public int[][] solveSudoku(@RequestBody int[][] board) {
-        return sudokuService.solveSudoku(board);
+    public ResponseEntity<int[][]> solveSudoku(@RequestBody int[][] board) {
+        if (board == null || board.length != 9 || !isValidSudokuBoard(board)) {
+            return ResponseEntity.badRequest().build(); // Return 400 Bad Request if the board is invalid
+        }
+        int[][] solvedBoard = sudokuService.solveSudoku(board);
+        return ResponseEntity.ok(solvedBoard); // Return 200 OK with the solved board
+    }
+
+    private boolean isValidSudokuBoard(int[][] board) {
+        for (int[] row : board) {
+            if (row == null || row.length != 9) {
+                return false;
+            }
+        }
+        return true;
     }
 }

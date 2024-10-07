@@ -1,11 +1,12 @@
 .sudoku-board {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: repeat(9, 1fr);
     height: 360px;
     width: 360px;
     margin-left: 200px;
     margin-top: 100px;
+    box-shadow: 0 0 0 1.5px black;
     box-sizing: border-box;
 }
 
@@ -13,14 +14,12 @@
     outline: none;
 }
 
-.sudoku-square {
+.sudoku-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    height: 120px;
-    width: 120px;
-    box-shadow: 0 0 0 1.5px black;
-    box-sizing: border-box;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(1, 1fr);
+    height: 40px;
+    width: 360px;
 
 }
 
@@ -32,7 +31,6 @@
     width: 40px;
     font-size: 30px;
     box-sizing: border-box;
-    border: 1px solid lightgray; /* Light border for each cell */
     margin: 0; /* Ensures no margin between cells */
     padding: 0;
     cursor: pointer;

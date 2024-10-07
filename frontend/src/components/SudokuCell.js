@@ -6,6 +6,14 @@ function SudokuCell({ cellKey, selectedCell, handleCellClick, value }) {
 
   const cellStyle = {
     backgroundColor: isSelected ? "#ADD8E6" : "white", // Highlight if selected
+    borderRight:
+      cellKey % 9 === 2 || cellKey % 9 === 5
+        ? "2px solid black"
+        : "1px solid lightgray",
+    borderBottom:
+      (cellKey >= 18 && cellKey < 27) || (cellKey >= 45 && cellKey < 54)
+        ? "2px solid black"
+        : "1px solid lightgray",
   };
 
   return (

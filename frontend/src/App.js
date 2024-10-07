@@ -8,7 +8,6 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route index element={<Play />} />
-        <Route path="/play" element={<Play />} />
         <Route path="/about" element={<About />} />
         <Route path="/solver" element={<Solver />} />
       </Routes>

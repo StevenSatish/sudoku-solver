@@ -13,8 +13,9 @@ function SideNav({ children }) {
   const changePage = (page) => {
     switch (page) {
       case 1:
-        if (window.location.pathname !== "/play") {
-          window.location.href = "/play";
+        if (window.location.pathname !== "/") {
+          console.log(window.location.pathname);
+          window.location.href = "/";
         }
         break;
       case 2:

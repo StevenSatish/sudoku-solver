@@ -20,7 +20,7 @@ public class SudokuService {
             for (int i = 0; i < lineNumber - 1; i++) {
                 br.readLine();  // Skip line
             }
-            // Read the target line
+            br.readLine(); // Read the target line
             String line = br.readLine();
             for (int row = 0; row < 9; row++) {
                 for (int col = 0; col < 9; col++) {
