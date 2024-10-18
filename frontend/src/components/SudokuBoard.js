@@ -14,12 +14,14 @@ import {
   DialogTitle,
   Divider,
   Drawer,
+  ListItemIcon,
   ListItemText,
   Switch,
   Typography,
 } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import { Check, Delete, Lightbulb, Visibility } from "@mui/icons-material";
 
 const SudokuBoard = forwardRef(
   ({ puzzle, instanceName, startingCells }, ref) => {
@@ -218,6 +220,66 @@ const SudokuBoard = forwardRef(
       }
     }
 
+    function resetPuzzle() {
+      const tempBoard = Array.from({ length: 9 }, () => Array(9).fill(0));
+      startingCells.forEach((value) => {
+        const rowIndex = Math.floor(value / 9);
+        const colIndex = value % 9;
+        tempBoard[rowIndex][colIndex] = puzzle[rowIndex][colIndex];
+      });
+      setBoard(tempBoard);
+    }
+
+    function revealPuzzle() {
+      setBoard(JSON.parse(localStorage.getItem("currentSolvedBoard")));
+    }
+
+    function revealCell() {
+      const solvedBoard = JSON.parse(
+        localStorage.getItem("currentSolvedBoard"),
+      );
+      const rowIndex = Math.floor(selectedCell / 9);
+      const colIndex = selectedCell % 9;
+      const newBoard = [...board];
+      newBoard[rowIndex][colIndex] = solvedBoard[rowIndex][colIndex];
+      setBoard(newBoard);
+    }
+
+    function checkCell() {
+      if (selectedCell !== null) {
+        const solvedBoard = JSON.parse(
+          localStorage.getItem("currentSolvedBoard"),
+        );
+        const rowIndex = Math.floor(selectedCell / 9);
+        const colIndex = selectedCell % 9;
+        if (solvedBoard[rowIndex][colIndex] !== board[rowIndex][colIndex]) {
+          let tempErrors = new Set(errorCells);
+          tempErrors.add(selectedCell);
+          setErrorCells(tempErrors);
+          setSelectedCell(null);
+        }
+      }
+    }
+
+    function checkPuzzle() {
+      const solvedBoard = JSON.parse(
+        localStorage.getItem("currentSolvedBoard"),
+      );
+      let tempErrors = new Set(errorCells);
+      for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+          if (
+            board[row][col] !== 0 &&
+            solvedBoard[row][col] !== board[row][col]
+          ) {
+            tempErrors.add(row * 9 + col);
+            setErrorCells(tempErrors);
+          }
+        }
+      }
+      setSelectedCell(null);
+    }
+
     const handleKeyDown = (event) => {
       if (selectedCell !== null) {
         const rowIndex = Math.floor(selectedCell / 9); // Get the row index
@@ -305,45 +367,57 @@ const SudokuBoard = forwardRef(
             <Button onClick={handleVictoryClose}>Play Again</Button>
           </DialogActions>
         </Dialog>
-        <Drawer anchor="right" variant="permanent" sx={{ width: 40 }}>
-          <Typography variant="h4" component="h4">
-            Sudoku Tools
-          </Typography>
-          <Divider />
-          <List>
-            <ListItem>
-              <Switch />
-              <ListItemText primary="Turn on Notes" />
-            </ListItem>
-
-            {/* Check Cell */}
-            <ListItem>
-              <ListItemText primary="Check Cell" />
-            </ListItem>
-
-            {/* Check Puzzle */}
-            <ListItem>
-              <ListItemText primary="Check Puzzle" />
-            </ListItem>
-
+        {instanceName === "Game" && (
+          <Drawer anchor="right" variant="permanent" sx={{ width: 40 }}>
+            <Typography variant="h4" component="h4">
+              Sudoku Tools
+            </Typography>
             <Divider />
-
-            {/* Reveal Cell */}
-            <ListItem>
-              <ListItemText primary="Reveal Cell" />
-            </ListItem>
-
-            {/* Reveal Puzzle */}
-            <ListItem>
-              <ListItemText primary="Reveal Puzzle" />
-            </ListItem>
-            <Divider />
-            {/* Reset Puzzle */}
-            <ListItem>
-              <ListItemText primary="Reset Puzzle" />
-            </ListItem>
-          </List>
-        </Drawer>
+            <List>
+              <ListItem>
+                <Switch />
+                <ListItemText primary="Notes Mode" />
+              </ListItem>
+              {/* Check Cell */}
+              <ListItem>
+                <ListItemIcon onClick={checkCell}>
+                  <Check />
+                </ListItemIcon>
+                <ListItemText primary="Check Cell" />
+              </ListItem>
+              {/* Check Puzzle */}
+              <ListItem>
+                <ListItemIcon onClick={checkPuzzle}>
+                  <Check />
+                </ListItemIcon>
+                <ListItemText primary="Check Puzzle" />
+              </ListItem>
+              <Divider />
+              {/* Reveal Cell */}
+              <ListItem>
+                <ListItemIcon onClick={revealCell}>
+                  <Visibility />
+                </ListItemIcon>
+                <ListItemText primary="Reveal Cell" />
+              </ListItem>
+              {/* Reveal Puzzle */}
+              <ListItem>
+                <ListItemIcon onClick={revealPuzzle}>
+                  <Lightbulb />
+                </ListItemIcon>
+                <ListItemText primary="Reveal Puzzle" />
+              </ListItem>
+              <Divider />
+              {/* Reset Puzzle */}
+              <ListItem>
+                <ListItemIcon onClick={resetPuzzle}>
+                  <Delete />
+                </ListItemIcon>
+                <ListItemText primary="Reset Puzzle" />
+              </ListItem>
+            </List>
+          </Drawer>
+        )}
       </div>
     );
   },
