@@ -4,6 +4,8 @@ import Solver from "./pages/Solver.js";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
+  const savedBoard = JSON.parse(localStorage.getItem("sudokuGame"));
+  console.log("savedBoard on re-render at App", savedBoard);
   return (
     <BrowserRouter>
       <Routes>

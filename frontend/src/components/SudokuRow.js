@@ -12,7 +12,7 @@ const SudokuRow = ({
   const row = board[rowIndex];
 
   function isErrorCell(cellIndex) {
-    return errorCells.some((cell) => cell === cellIndex);
+    return errorCells.has(cellIndex);
   }
 
   return (
