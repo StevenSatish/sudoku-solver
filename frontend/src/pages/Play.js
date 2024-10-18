@@ -55,10 +55,37 @@ function Play() {
       const startingCellsArr = Array.from(newStartingCells);
       localStorage.setItem("startingCells", JSON.stringify(startingCellsArr));
       setPuzzle(puzzleData);
+      computeFinishedPuzzle(puzzleData);
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
+  function computeFinishedPuzzle(puzzleData) {
+    const requestBody = puzzleData; // Puzzle is the state holding the 2D array
+    console.log("Sending fetched board:", requestBody); // Log what you're sending
+
+    fetch("http://localhost:8080/api/sudoku/solve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody), // Convert the board to JSON
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to solve the puzzle");
+        }
+        return response.json(); // Return the JSON data as a Promise
+      })
+      .then((data) => {
+        localStorage.setItem(`currentSolvedBoard`, JSON.stringify(data));
+      })
+      .catch((error) => {
+        console.error("Error solving fetched board:", error);
+      });
+  }
+
   useEffect(() => {
     const startingCellsArr =
       JSON.parse(localStorage.getItem("startingCells")) || [];

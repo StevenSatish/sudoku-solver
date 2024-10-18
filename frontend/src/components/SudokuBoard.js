@@ -6,16 +6,32 @@ import React, {
 } from "react";
 import "./SudokuStyles.css";
 import SudokuRow from "./SudokuRow";
-import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
+import Confetti from "react-confetti";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Divider,
+  Drawer,
+  ListItemText,
+  Switch,
+  Typography,
+} from "@mui/material";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
 
 const SudokuBoard = forwardRef(
   ({ puzzle, instanceName, startingCells }, ref) => {
     const [selectedCell, setSelectedCell] = useState(null);
+    const [confetti, setConfetti] = useState(false);
+    const [fadeOut, setFadeOut] = useState(false);
     const [errorCells, setErrorCells] = useState(new Set());
     const [board, setBoard] = useState(
       Array.from({ length: 9 }, () => Array(9).fill(0)),
     );
-    const [open, setOpen] = React.useState(false);
+    const [errorOpen, setErrorOpen] = React.useState(false);
+    const [victoryOpen, setVictoryOpen] = React.useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const countNonZeroCells = (board) => {
       return board.reduce(
@@ -24,7 +40,7 @@ const SudokuBoard = forwardRef(
       );
     };
     const handleClickOpen = (errorIndex) => {
-      setOpen(true);
+      setErrorOpen(true);
       if (errorIndex !== undefined && errorIndex === 1) {
         setErrorMessage("There is no solution for this puzzle.");
       } else if (errorIndex !== undefined && errorIndex === 2) {
@@ -35,7 +51,21 @@ const SudokuBoard = forwardRef(
     };
 
     const handleClose = () => {
-      setOpen(false);
+      setErrorOpen(false);
+    };
+    const handleVictoryOpen = () => {
+      setVictoryOpen(true);
+      setConfetti(true);
+      setFadeOut(false);
+      setTimeout(() => {
+        setFadeOut(true); // Start fading out after a delay
+        setTimeout(() => {
+          setConfetti(false); // Hide confetti after fading out
+        }, 1000); // Wait for the fade-out duration
+      }, 3000); // Confetti duration before fading out
+    };
+    const handleVictoryClose = () => {
+      setVictoryOpen(false);
     };
     useImperativeHandle(ref, () => {
       return {
@@ -58,6 +88,12 @@ const SudokuBoard = forwardRef(
     useEffect(() => {
       localStorage.setItem(`sudoku${instanceName}`, JSON.stringify(board));
       runCellErrorCheck();
+      const solution = JSON.parse(localStorage.getItem("currentSolvedBoard"));
+      if (solution) {
+        if (arraysAreEqual(board, solution) && instanceName === "Game") {
+          handleVictoryOpen();
+        }
+      }
     }, [board, instanceName]);
 
     // Define the async function to solve the board
@@ -239,6 +275,7 @@ const SudokuBoard = forwardRef(
     };
     return (
       <div tabIndex={0} className={"sudoku-board"} onKeyDown={handleKeyDown}>
+        {confetti && <Confetti className={` ${fadeOut ? "fade-out" : ""}`} />}
         {board.map((row, rowIndex) => (
           <SudokuRow
             key={rowIndex}
@@ -249,7 +286,7 @@ const SudokuBoard = forwardRef(
             errorCells={errorCells}
           />
         ))}
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={errorOpen} onClose={handleClose}>
           <DialogTitle id="alert-dialog-title">{errorMessage}</DialogTitle>
           <DialogActions>
             <Button onClick={handleClose} autoFocus>
@@ -257,6 +294,56 @@ const SudokuBoard = forwardRef(
             </Button>
           </DialogActions>
         </Dialog>
+        <Dialog open={victoryOpen} onClose={handleVictoryClose}>
+          <DialogTitle id="alert-dialog-title">
+            Congratulations! You've conquered this Sudoku Board
+          </DialogTitle>
+          <DialogActions>
+            <Button onClick={handleVictoryClose} autoFocus>
+              dismiss
+            </Button>
+            <Button onClick={handleVictoryClose}>Play Again</Button>
+          </DialogActions>
+        </Dialog>
+        <Drawer anchor="right" variant="permanent" sx={{ width: 40 }}>
+          <Typography variant="h4" component="h4">
+            Sudoku Tools
+          </Typography>
+          <Divider />
+          <List>
+            <ListItem>
+              <Switch />
+              <ListItemText primary="Turn on Notes" />
+            </ListItem>
+
+            {/* Check Cell */}
+            <ListItem>
+              <ListItemText primary="Check Cell" />
+            </ListItem>
+
+            {/* Check Puzzle */}
+            <ListItem>
+              <ListItemText primary="Check Puzzle" />
+            </ListItem>
+
+            <Divider />
+
+            {/* Reveal Cell */}
+            <ListItem>
+              <ListItemText primary="Reveal Cell" />
+            </ListItem>
+
+            {/* Reveal Puzzle */}
+            <ListItem>
+              <ListItemText primary="Reveal Puzzle" />
+            </ListItem>
+            <Divider />
+            {/* Reset Puzzle */}
+            <ListItem>
+              <ListItemText primary="Reset Puzzle" />
+            </ListItem>
+          </List>
+        </Drawer>
       </div>
     );
   },
