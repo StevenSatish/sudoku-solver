@@ -36,6 +36,10 @@ function SideNav({ children }) {
         PaperProps={{
           style: {
             backgroundColor: "black", // Set background color to black
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            height: "100vh", // Ensure the Drawer fills the viewport height
           },
         }}
         sx={{

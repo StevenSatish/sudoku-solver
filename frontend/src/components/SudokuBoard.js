@@ -38,9 +38,29 @@ const SudokuBoard = forwardRef(
     const [fadeOut, setFadeOut] = useState(false);
     const [errorCells, setErrorCells] = useState(new Set());
     const [confirmedAction, setConfirmedAction] = useState(null);
-    const [board, setBoard] = useState(
-      Array.from({ length: 9 }, () => Array(9).fill(0)),
-    );
+    const [board, setBoard] = useState(() => {
+      const savedBoard = JSON.parse(
+        localStorage.getItem(`sudoku${instanceName}`),
+      );
+      if (savedBoard && Array.isArray(savedBoard) && savedBoard.length === 9) {
+        // Optionally validate the structure further
+        return savedBoard;
+      } else {
+        // Initialize as before
+        const initialBoard = [];
+        for (let row = 0; row < 9; row++) {
+          const currentRow = [];
+          for (let col = 0; col < 9; col++) {
+            currentRow.push({
+              value: 0,
+              notes: [],
+            });
+          }
+          initialBoard.push(currentRow);
+        }
+        return initialBoard;
+      }
+    });
     const [errorOpen, setErrorOpen] = React.useState(false);
     const [victoryOpen, setVictoryOpen] = React.useState(false);
     const [confirmOpen, setConfirmOpen] = React.useState(false);
@@ -48,7 +68,7 @@ const SudokuBoard = forwardRef(
     const [confirmMessage, setConfirmMessage] = useState("");
     const countNonZeroCells = (board) => {
       return board.reduce(
-        (total, row) => total + row.filter((cell) => cell !== 0).length,
+        (total, row) => total + row.filter((cell) => cell.value !== 0).length,
         0,
       );
     };
@@ -108,8 +128,31 @@ const SudokuBoard = forwardRef(
         puzzle.length === 9 &&
         puzzle.every((row) => Array.isArray(row) && row.length === 9)
       ) {
+        // Check if the elements in puzzle are cell objects
+        const isPuzzleCellObjects = puzzle.every((row) =>
+          row.every(
+            (cell) =>
+              typeof cell === "object" &&
+              cell !== null &&
+              "value" in cell &&
+              "notes" in cell,
+          ),
+        );
+
+        if (isPuzzleCellObjects) {
+          // Puzzle is already an array of cell objects
+          setBoard(puzzle);
+        } else {
+          // Puzzle is an array of numbers, map over it to create cell objects
+          const newBoard = puzzle.map((row) =>
+            row.map((cellValue) => ({
+              value: cellValue,
+              notes: [],
+            })),
+          );
+          setBoard(newBoard);
+        }
         localStorage.setItem(`sudoku${instanceName}`, JSON.stringify(puzzle));
-        setBoard(puzzle); // Update board if puzzle is valid
       }
     }, [puzzle]);
 
@@ -128,7 +171,7 @@ const SudokuBoard = forwardRef(
     // Define the async function to solve the board
     async function fillBoard() {
       try {
-        const requestBody = board; // Puzzle is the state holding the 2D array
+        const requestBody = board.map((row) => row.map((cell) => cell.value));
         console.log("Sending board:", requestBody); // Log what you're sending
         if (countNonZeroCells(board) < 22) {
           handleClickOpen(2);
@@ -147,11 +190,18 @@ const SudokuBoard = forwardRef(
         }
 
         const data = await response.json();
-        if (arraysAreEqual(data, board)) {
+        if (arraysAreEqual(board, data)) {
           handleClickOpen();
           throw new Error("Invalid Sudoku Configuration");
         }
-        setBoard(data); // Update your board state with the solved puzzle
+        const newBoard = board.map((row, rowIndex) =>
+          row.map((cell, colIndex) => ({
+            ...cell,
+            value: data[rowIndex][colIndex],
+            notes: [],
+          })),
+        );
+        setBoard(newBoard);
       } catch (error) {
         console.error("Error sending board to backend:", error);
       }
@@ -161,11 +211,21 @@ const SudokuBoard = forwardRef(
       if (arr1.length !== arr2.length) return false;
 
       for (let i = 0; i < arr1.length; i++) {
-        if (Array.isArray(arr1[i]) && Array.isArray(arr2[i])) {
+        const elem1 = arr1[i];
+        const elem2 = arr2[i];
+
+        if (Array.isArray(elem1) && Array.isArray(elem2)) {
           // Recursively check nested arrays
-          if (!arraysAreEqual(arr1[i], arr2[i])) return false;
-        } else if (arr1[i] !== arr2[i]) {
-          return false;
+          if (!arraysAreEqual(elem1, elem2)) return false;
+        } else {
+          const value1 =
+            typeof elem1 === "object" && elem1 !== null ? elem1.value : elem1;
+          const value2 =
+            typeof elem2 === "object" && elem2 !== null ? elem2.value : elem2;
+
+          if (value1 !== value2) {
+            return false;
+          }
         }
       }
 
@@ -189,7 +249,7 @@ const SudokuBoard = forwardRef(
       // Iterate through each cell in the board
       for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
-          let value = board[row][col];
+          let value = board[row][col].value;
           if (value === 0) {
             continue; // Skip empty cells
           }
@@ -213,7 +273,7 @@ const SudokuBoard = forwardRef(
       function rowCheck(rowIndex, colIndex, value) {
         let rowErrors = new Set();
         for (let i = 0; i < 9; i++) {
-          if (i !== colIndex && board[rowIndex][i] === value) {
+          if (i !== colIndex && board[rowIndex][i].value === value) {
             rowErrors.add(rowIndex * 9 + i);
           }
         }
@@ -223,7 +283,7 @@ const SudokuBoard = forwardRef(
       function colCheck(colIndex, rowIndex, value) {
         let colErrors = new Set();
         for (let i = 0; i < 9; i++) {
-          if (i !== rowIndex && board[i][colIndex] === value) {
+          if (i !== rowIndex && board[i][colIndex].value === value) {
             colErrors.add(i * 9 + colIndex);
           }
         }
@@ -237,8 +297,10 @@ const SudokuBoard = forwardRef(
 
         for (let i = squareRow; i < squareRow + 3; i++) {
           for (let j = squareCol; j < squareCol + 3; j++) {
-            // Skip the current cell
-            if ((i !== rowIndex || j !== colIndex) && board[i][j] === value) {
+            if (
+              (i !== rowIndex || j !== colIndex) &&
+              board[i][j].value === value
+            ) {
               squareErrors.add(i * 9 + j);
             }
           }
@@ -248,18 +310,37 @@ const SudokuBoard = forwardRef(
     }
 
     function resetPuzzle() {
-      const tempBoard = Array.from({ length: 9 }, () => Array(9).fill(0));
-      startingCells.forEach((value) => {
-        const rowIndex = Math.floor(value / 9);
-        const colIndex = value % 9;
-        tempBoard[rowIndex][colIndex] = puzzle[rowIndex][colIndex];
-      });
+      const tempBoard = board.map((row, rowIndex) =>
+        row.map((cell, colIndex) => {
+          if (startingCells.has(rowIndex * 9 + colIndex)) {
+            return {
+              ...cell,
+              value: puzzle[rowIndex][colIndex].value,
+              notes: [],
+            };
+          } else {
+            return { ...cell, value: 0, notes: [] };
+          }
+        }),
+      );
       setBoard(tempBoard);
     }
 
     function revealPuzzle() {
-      setSelectedCell(null);
-      setBoard(JSON.parse(localStorage.getItem("currentSolvedBoard")));
+      const solvedBoard = JSON.parse(
+        localStorage.getItem("currentSolvedBoard"),
+      );
+      if (solvedBoard) {
+        const newBoard = board.map((row, rowIndex) =>
+          row.map((cell, colIndex) => ({
+            ...cell,
+            value: solvedBoard[rowIndex][colIndex],
+            notes: [],
+          })),
+        );
+        setBoard(newBoard);
+        setSelectedCell(null);
+      }
     }
 
     function revealCell() {
@@ -268,8 +349,8 @@ const SudokuBoard = forwardRef(
       );
       const rowIndex = Math.floor(selectedCell / 9);
       const colIndex = selectedCell % 9;
-      const newBoard = [...board];
-      newBoard[rowIndex][colIndex] = solvedBoard[rowIndex][colIndex];
+      const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
+      newBoard[rowIndex][colIndex].value = solvedBoard[rowIndex][colIndex];
       setBoard(newBoard);
     }
 
@@ -280,7 +361,9 @@ const SudokuBoard = forwardRef(
         );
         const rowIndex = Math.floor(selectedCell / 9);
         const colIndex = selectedCell % 9;
-        if (solvedBoard[rowIndex][colIndex] !== board[rowIndex][colIndex]) {
+        if (
+          solvedBoard[rowIndex][colIndex] !== board[rowIndex][colIndex].value
+        ) {
           let tempErrors = new Set(errorCells);
           tempErrors.add(selectedCell);
           setErrorCells(tempErrors);
@@ -297,8 +380,8 @@ const SudokuBoard = forwardRef(
       for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
           if (
-            board[row][col] !== 0 &&
-            solvedBoard[row][col] !== board[row][col]
+            board[row][col].value !== 0 &&
+            solvedBoard[row][col] !== board[row][col].value
           ) {
             tempErrors.add(row * 9 + col);
             setErrorCells(tempErrors);
@@ -310,14 +393,29 @@ const SudokuBoard = forwardRef(
 
     const handleKeyDown = (event) => {
       if (selectedCell !== null) {
-        const rowIndex = Math.floor(selectedCell / 9); // Get the row index
-        const colIndex = selectedCell % 9; // Get the column index
+        const rowIndex = Math.floor(selectedCell / 9);
+        const colIndex = selectedCell % 9;
+
         if (/^[1-9]$/.test(event.key) && !startingCells.has(selectedCell)) {
-          const newBoard = [...board];
-          newBoard[rowIndex] = [...newBoard[rowIndex]]; // Create a copy of the row
-          newBoard[rowIndex][colIndex] = parseInt(event.key); // Set the new value
-          setBoard(newBoard); // Update the board state
-          //addErrorCells(selectedCell, newBoard);
+          const num = parseInt(event.key);
+
+          const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
+          const newCell = { ...newBoard[rowIndex][colIndex] };
+
+          if (notesMode) {
+            // Toggle note
+            if (newCell.notes.includes(num)) {
+              newCell.notes = newCell.notes.filter((n) => n !== num);
+            } else {
+              newCell.notes = [...newCell.notes, num];
+            }
+          } else {
+            // Set value and clear notes
+            newCell.value = num;
+          }
+
+          newBoard[rowIndex][colIndex] = newCell;
+          setBoard(newBoard);
         } else {
           switch (event.key) {
             case "ArrowUp":
@@ -344,11 +442,11 @@ const SudokuBoard = forwardRef(
             case "Delete":
               if (
                 !startingCells.has(selectedCell) &&
-                board[rowIndex][colIndex] !== 0
+                board[rowIndex][colIndex].value !== 0
               ) {
                 const newBoard = [...board];
                 newBoard[rowIndex] = [...newBoard[rowIndex]]; // Create a copy of the row
-                newBoard[rowIndex][colIndex] = 0; // Clear the value
+                newBoard[rowIndex][colIndex].value = 0; // Clear the value
                 setBoard(newBoard); // Update the board state
                 //removeErrorCells(selectedCell);
               }
@@ -374,7 +472,7 @@ const SudokuBoard = forwardRef(
                 rowIndex={rowIndex}
                 selectedCell={selectedCell}
                 handleCellClick={handleCellClick}
-                board={board}
+                row={row}
                 errorCells={errorCells}
               />
             ))}
@@ -385,7 +483,7 @@ const SudokuBoard = forwardRef(
             sx={{
               "& .MuiDialog-paper": {
                 backgroundColor: "black", // Black dialog background
-                color: "#FF0099", // White text color
+                color: "#00b8ff", // White text color
               },
             }}
             open={errorOpen}
@@ -393,7 +491,7 @@ const SudokuBoard = forwardRef(
           >
             <DialogTitle id="alert-dialog-title">{errorMessage}</DialogTitle>
             <DialogActions>
-              <Button sx={{ color: "#FF0099" }} onClick={handleClose} autoFocus>
+              <Button sx={{ color: "#00b8ff" }} onClick={handleClose} autoFocus>
                 Dismiss
               </Button>
             </DialogActions>
@@ -403,7 +501,7 @@ const SudokuBoard = forwardRef(
             sx={{
               "& .MuiDialog-paper": {
                 backgroundColor: "black", // Black dialog background
-                color: "#FF0099", // Pink text color
+                color: "#00b8ff", // Pink text color
               },
             }}
             open={confirmOpen}
@@ -412,7 +510,7 @@ const SudokuBoard = forwardRef(
             <DialogTitle id="alert-dialog-title">Are you sure?</DialogTitle>
             <DialogContent>
               <DialogContentText
-                sx={{ color: "#FF0099" }}
+                sx={{ color: "#00b8ff" }}
                 id="alert-dialog-description"
               >
                 {confirmMessage}
@@ -420,14 +518,14 @@ const SudokuBoard = forwardRef(
             </DialogContent>
             <DialogActions>
               <Button
-                sx={{ color: "#FF0099" }}
+                sx={{ color: "#00b8ff" }}
                 onClick={handleConfirmClose}
                 autoFocus
               >
                 No
               </Button>
               <Button
-                sx={{ color: "#FF0099" }}
+                sx={{ color: "#00b8ff" }}
                 onClick={() => {
                   if (confirmedAction) {
                     confirmedAction();
@@ -444,7 +542,7 @@ const SudokuBoard = forwardRef(
             sx={{
               "& .MuiDialog-paper": {
                 backgroundColor: "black", // Black dialog background
-                color: "#FF0099", // White text color
+                color: "#00b8ff", // White text color
               },
             }}
             open={victoryOpen}
@@ -455,14 +553,14 @@ const SudokuBoard = forwardRef(
             </DialogTitle>
             <DialogActions>
               <Button
-                sx={{ color: "#FF0099" }}
+                sx={{ color: "#00b8ff" }}
                 onClick={handleVictoryClose}
                 autoFocus
               >
                 Dismiss
               </Button>
               <Button
-                sx={{ color: "#FF0099" }}
+                sx={{ color: "#00b8ff" }}
                 onClick={() => {
                   fetchPuzzle();
                   handleVictoryClose();

@@ -4,7 +4,14 @@ import SudokuBoard from "../components/SudokuBoard";
 import { useEffect, useState } from "react";
 
 function Play() {
-  const [puzzle, setPuzzle] = useState([]);
+  const initialPuzzle = Array.from({ length: 9 }, () =>
+    Array.from({ length: 9 }, () => ({
+      value: 0,
+      notes: [],
+    })),
+  );
+
+  const [puzzle, setPuzzle] = useState(initialPuzzle);
   const [fetchedStartingCells, setStartingCells] = useState(new Set());
   const savedBoard = JSON.parse(localStorage.getItem("sudokuGame"));
   useEffect(() => {
@@ -12,7 +19,7 @@ function Play() {
     // Check if savedBoard exists and is properly formatted
     if (savedBoard && Array.isArray(savedBoard) && savedBoard.length === 9) {
       const isBoardEmpty = savedBoard.every((row) =>
-        row.every((cell) => cell === 0),
+        row.every((cell) => cell.value === 0),
       );
       if (isBoardEmpty) {
         console.log("board empty");
@@ -43,7 +50,14 @@ function Play() {
       }
       console.log("Fetching puzzle...");
       const puzzleData = await response.json(); // The puzzle is a 2D array (int[][])
-      localStorage.setItem(`sudokuGame`, JSON.stringify(puzzleData));
+      const board = puzzleData.map((row) =>
+        row.map((cellValue) => ({
+          value: cellValue,
+          notes: [],
+        })),
+      );
+
+      localStorage.setItem(`sudokuGame`, JSON.stringify(board));
       const newStartingCells = new Set();
       for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
@@ -54,7 +68,7 @@ function Play() {
       }
       const startingCellsArr = Array.from(newStartingCells);
       localStorage.setItem("startingCells", JSON.stringify(startingCellsArr));
-      setPuzzle(puzzleData);
+      setPuzzle(board);
       computeFinishedPuzzle(puzzleData);
     } catch (error) {
       console.error("Error:", error);

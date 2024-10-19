@@ -3,67 +3,51 @@ import Note from "./Note";
 import React from "react";
 
 function SudokuCell({
-  notes,
-  cellKey,
+  cell,
+  cellIndex,
   selectedCell,
   handleCellClick,
-  value,
   errorCell,
 }) {
-  const notePositions = {
-    1: "1 / 1 / 2 / 2", // Top-left
-    2: "1 / 2 / 2 / 3", // Top-center
-    3: "1 / 3 / 2 / 4", // Top-right
-    4: "2 / 1 / 3 / 2", // Middle-left
-    5: "2 / 2 / 3 / 3", // Middle-center
-    6: "2 / 3 / 3 / 4", // Middle-right
-    7: "3 / 1 / 4 / 2", // Bottom-left
-    8: "3 / 2 / 4 / 3", // Bottom-center
-    9: "3 / 3 / 4 / 4", // Bottom-right
-  };
   // Check if this cell is the selected one
-  const isSelected = selectedCell === cellKey;
+  const isSelected = selectedCell === cellIndex;
   const isError = errorCell ? "red" : "black";
   const cellStyle = {
     backgroundColor: isSelected ? "#00b8ff" : isError, // Highlight if selected
     borderRight:
-      cellKey % 9 === 8
+      cellIndex % 9 === 8
         ? "none"
-        : cellKey % 9 === 2 || cellKey % 9 === 5
+        : cellIndex % 9 === 2 || cellIndex % 9 === 5
           ? "2px solid #00b8ff"
           : "1px solid lightgray",
     borderBottom:
-      cellKey > 72
+      cellIndex > 72
         ? "none"
-        : (cellKey >= 18 && cellKey < 27) ||
-            (cellKey >= 45 && cellKey < 54) ||
-            cellKey >= 72
+        : (cellIndex >= 18 && cellIndex < 27) ||
+            (cellIndex >= 45 && cellIndex < 54) ||
+            cellIndex >= 72
           ? "2px solid #00b8ff"
           : "1px solid lightgray",
   };
 
-  return value === 0 ? (
-    <div style={cellStyle} className="notes-cell">
-      {Object.keys(notePositions).map((key) => {
-        const noteValue = parseInt(key);
-        return notes.includes(noteValue) ? ( // Check if the note is in the selected notes array
-          <Note
-            key={key}
-            note={noteValue}
-            position={notePositions[noteValue]}
-          />
-        ) : null; // Return null if the note is not selected
-      })}
-    </div>
-  ) : (
+  return (
     <div
-      className={"sudoku-cell"}
+      className={cell.value === 0 ? "notes-cell" : "sudoku-cell"}
       style={cellStyle}
-      onClick={() => handleCellClick(cellKey)} // Handle click to select the cell
+      onClick={() => handleCellClick(cellIndex)}
     >
-      <span className={"cell-text"}>
-        {value || ""} {/* Display the value of the cell */}
-      </span>
+      {cell.value === 0 ? (
+        // Render notes grid
+        <div className="notes-grid">
+          {Array.from({ length: 9 }, (_, i) => i + 1).map((noteValue) => (
+            <div key={noteValue} className="note">
+              {cell.notes.includes(noteValue) ? noteValue : null}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <span className="cell-text">{cell.value}</span>
+      )}
     </div>
   );
 }

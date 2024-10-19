@@ -31,14 +31,6 @@ function Solver() {
           instanceName={"Solver"}
           startingCells={startingCells}
         />
-        {/*<Button*/}
-        {/*  variant="text"*/}
-        {/*  onClick={() => {*/}
-        {/*    ref.current?.solveBoard();*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  SOLVE!*/}
-        {/*</Button>*/}
       </div>
     </SideNav>
   );
