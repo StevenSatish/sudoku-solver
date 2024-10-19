@@ -1,11 +1,7 @@
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import {
-  Drawer,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import "../App.css";
+import { Drawer, ListItemButton, ListItemText } from "@mui/material";
 
 const drawerWidth = 240; // Set the width of the Drawer
 
@@ -33,33 +29,37 @@ function SideNav({ children }) {
     }
   };
   return (
-    <div style={{ display: "flex" }}>
+    <div className={"sidenav"} style={{ display: "flex" }}>
       <Drawer
         variant="permanent"
         anchor="left"
+        PaperProps={{
+          style: {
+            backgroundColor: "black", // Set background color to black
+          },
+        }}
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
         }}
       >
         <List>
           <ListItem key="Sudoku" disablePadding>
             <ListItemButton onClick={() => changePage(1)}>
-              <ListItemText primary="Sudoku" />
+              <ListItemText primary="Sudoku" sx={{ color: "white" }} />
             </ListItemButton>
           </ListItem>
           <ListItem key="Sudoku Solver" disablePadding>
             <ListItemButton onClick={() => changePage(2)}>
-              <ListItemText primary="Sudoku Solver" />
+              <ListItemText primary="Sudoku Solver" sx={{ color: "white" }} />
             </ListItemButton>
           </ListItem>
           <ListItem key="About" disablePadding>
             <ListItemButton onClick={() => changePage(3)}>
-              <ListItemText primary="About / Tips & Tricks" />
+              <ListItemText
+                primary="About / Tips & Tricks"
+                sx={{ color: "white" }}
+              />
             </ListItemButton>
           </ListItem>
         </List>

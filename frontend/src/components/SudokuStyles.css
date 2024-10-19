@@ -1,12 +1,29 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+}
+
+.container:focus {
+    outline: none; /* Remove the default focus outline */
+}
+
+.sudoku-board-wrapper {
+    order: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .sudoku-board {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: repeat(9, 1fr);
     height: 360px;
     width: 360px;
-    margin-left: 200px;
-    margin-top: 100px;
-    box-shadow: 0 0 0 1.5px purple;
+    box-shadow: 0 0 0 2px #00b8ff;
     box-sizing: border-box;
 }
 
@@ -40,8 +57,28 @@
     color: white;
 }
 
-
 .fade-out {
     opacity: 0;
     transition: opacity 1s ease-out;
+}
+
+.tools-list {
+    color: white;
+    border: 3px solid #00b8ff;
+    order: 1;
+    width: 240px;
+}
+
+.tool-icons {
+    color: white !important; /* Change to your desired color */
+}
+
+.tool-icon-divider {
+    background-color: #00b8ff;
+    height: 3px;
+}
+
+.pop-up-modals {
+    background-color: black;
+    color: #00b8ff;
 }

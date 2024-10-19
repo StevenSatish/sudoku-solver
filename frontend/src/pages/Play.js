@@ -95,18 +95,14 @@ function Play() {
     }
   }, [puzzle]);
   return (
-    <SideNav>
-      <div className="App"></div>
-      {!puzzle && <p>Loading...</p>}{" "}
-      {/* Display a loading message if puzzle is not available */}
-      {puzzle && (
-        <SudokuBoard
-          puzzle={puzzle}
-          instanceName={"Game"}
-          startingCells={fetchedStartingCells}
-        />
-      )}{" "}
-      {/* Render SudokuBoard only if puzzle is available */}
+    <SideNav className="App">
+      <SudokuBoard
+        className="board"
+        puzzle={puzzle}
+        instanceName={"Game"}
+        startingCells={fetchedStartingCells}
+        fetchPuzzle={fetchSudokuPuzzle}
+      />
     </SideNav>
   );
 }

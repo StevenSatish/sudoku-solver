@@ -1,0 +1,14 @@
+html, body {
+    height: 100%; /* Ensure the body and html elements take up full height */
+    margin: 0; /* Remove any default margin */
+}
+
+.App {
+    z-index: 1000; /* Ensure the App is above the background */
+    height: 100vh; /* Set the height of the App to 100% of the viewport height */
+    width: 100vw; /* Optionally set the width to 100% of the viewport width */
+    background: black;
+    display: flex; /* Flexbox to center content (optional) */
+    justify-content: center; /* Center content horizontally (optional) */
+    align-items: center; /* Center content vertically (optional) */
+}

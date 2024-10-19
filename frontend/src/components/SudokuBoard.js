@@ -13,18 +13,17 @@ import {
   DialogActions,
   DialogTitle,
   Divider,
-  Drawer,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Switch,
-  Typography,
 } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import { Check, Delete, Lightbulb, Visibility } from "@mui/icons-material";
 
 const SudokuBoard = forwardRef(
-  ({ puzzle, instanceName, startingCells }, ref) => {
+  ({ puzzle, instanceName, startingCells, fetchPuzzle }, ref) => {
     const [selectedCell, setSelectedCell] = useState(null);
     const [confetti, setConfetti] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
@@ -336,87 +335,108 @@ const SudokuBoard = forwardRef(
       setSelectedCell(cellIndex);
     };
     return (
-      <div tabIndex={0} className={"sudoku-board"} onKeyDown={handleKeyDown}>
+      <div tabIndex={0} className="container" onKeyDown={handleKeyDown}>
         {confetti && <Confetti className={` ${fadeOut ? "fade-out" : ""}`} />}
-        {board.map((row, rowIndex) => (
-          <SudokuRow
-            key={rowIndex}
-            rowIndex={rowIndex}
-            selectedCell={selectedCell}
-            handleCellClick={handleCellClick}
-            board={board}
-            errorCells={errorCells}
-          />
-        ))}
-        <Dialog open={errorOpen} onClose={handleClose}>
-          <DialogTitle id="alert-dialog-title">{errorMessage}</DialogTitle>
-          <DialogActions>
-            <Button onClick={handleClose} autoFocus>
-              dismiss
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={victoryOpen} onClose={handleVictoryClose}>
-          <DialogTitle id="alert-dialog-title">
-            Congratulations! You've conquered this Sudoku Board
-          </DialogTitle>
-          <DialogActions>
-            <Button onClick={handleVictoryClose} autoFocus>
-              dismiss
-            </Button>
-            <Button onClick={handleVictoryClose}>Play Again</Button>
-          </DialogActions>
-        </Dialog>
+        <div className="sudoku-board-wrapper">
+          <div className="sudoku-board">
+            {board.map((row, rowIndex) => (
+              <SudokuRow
+                key={rowIndex}
+                rowIndex={rowIndex}
+                selectedCell={selectedCell}
+                handleCellClick={handleCellClick}
+                board={board}
+                errorCells={errorCells}
+              />
+            ))}
+          </div>
+
+          {/* Dialogs */}
+          <Dialog open={errorOpen} onClose={handleClose}>
+            <DialogTitle id="alert-dialog-title">{errorMessage}</DialogTitle>
+            <DialogActions>
+              <Button onClick={handleClose} autoFocus>
+                Dismiss
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            sx={{
+              "& .MuiDialog-paper": {
+                backgroundColor: "black", // Black dialog background
+                color: "#FF0099", // White text color
+              },
+            }}
+            open={victoryOpen}
+            onClose={handleVictoryClose}
+          >
+            <DialogTitle id="alert-dialog-title">
+              Congratulations! You've completed this Sudoku Board!
+            </DialogTitle>
+            <DialogActions>
+              <Button
+                sx={{ color: "#FF0099" }}
+                onClick={handleVictoryClose}
+                autoFocus
+              >
+                Dismiss
+              </Button>
+              <Button
+                sx={{ color: "#FF0099" }}
+                onClick={() => {
+                  fetchPuzzle();
+                  handleVictoryClose();
+                }}
+              >
+                Play Again
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+
         {instanceName === "Game" && (
-          <Drawer anchor="right" variant="permanent" sx={{ width: 40 }}>
-            <Typography variant="h4" component="h4">
-              Sudoku Tools
-            </Typography>
-            <Divider />
+          <div className="tools-list">
             <List>
               <ListItem>
                 <Switch />
                 <ListItemText primary="Notes Mode" />
               </ListItem>
-              {/* Check Cell */}
-              <ListItem>
-                <ListItemIcon onClick={checkCell}>
+              <Divider className={"tool-icon-divider"} />
+              <ListItemButton onClick={checkCell}>
+                <ListItemIcon className={"tool-icons"}>
                   <Check />
                 </ListItemIcon>
                 <ListItemText primary="Check Cell" />
-              </ListItem>
-              {/* Check Puzzle */}
-              <ListItem>
-                <ListItemIcon onClick={checkPuzzle}>
+              </ListItemButton>
+              <ListItemButton onClick={checkPuzzle}>
+                <ListItemIcon className={"tool-icons"}>
                   <Check />
                 </ListItemIcon>
                 <ListItemText primary="Check Puzzle" />
-              </ListItem>
-              <Divider />
-              {/* Reveal Cell */}
-              <ListItem>
-                <ListItemIcon onClick={revealCell}>
+              </ListItemButton>
+              <Divider className={"tool-icon-divider"} />
+              <ListItemButton onClick={revealCell}>
+                <ListItemIcon className={"tool-icons"}>
                   <Visibility />
                 </ListItemIcon>
                 <ListItemText primary="Reveal Cell" />
-              </ListItem>
-              {/* Reveal Puzzle */}
-              <ListItem>
-                <ListItemIcon onClick={revealPuzzle}>
+              </ListItemButton>
+              <ListItemButton onClick={revealPuzzle}>
+                <ListItemIcon className={"tool-icons"}>
                   <Lightbulb />
                 </ListItemIcon>
                 <ListItemText primary="Reveal Puzzle" />
-              </ListItem>
-              <Divider />
-              {/* Reset Puzzle */}
-              <ListItem>
-                <ListItemIcon onClick={resetPuzzle}>
+              </ListItemButton>
+              <Divider className={"tool-icon-divider"} />
+              <ListItemButton onClick={resetPuzzle}>
+                <ListItemIcon className={"tool-icons"}>
                   <Delete />
                 </ListItemIcon>
                 <ListItemText primary="Reset Puzzle" />
-              </ListItem>
+              </ListItemButton>
             </List>
-          </Drawer>
+          </div>
         )}
       </div>
     );

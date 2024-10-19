@@ -11,15 +11,21 @@ function SudokuCell({
   const isSelected = selectedCell === cellKey;
   const isError = errorCell ? "red" : "black";
   const cellStyle = {
-    backgroundColor: isSelected ? "#ADD8E6" : isError, // Highlight if selected
+    backgroundColor: isSelected ? "#00b8ff" : isError, // Highlight if selected
     borderRight:
-      cellKey % 9 === 2 || cellKey % 9 === 5
-        ? "2px solid purple"
-        : "1px solid lightgray",
+      cellKey % 9 === 8
+        ? "none"
+        : cellKey % 9 === 2 || cellKey % 9 === 5
+          ? "2px solid #00b8ff"
+          : "1px solid lightgray",
     borderBottom:
-      (cellKey >= 18 && cellKey < 27) || (cellKey >= 45 && cellKey < 54)
-        ? "2px solid purple"
-        : "1px solid lightgray",
+      cellKey > 72
+        ? "none"
+        : (cellKey >= 18 && cellKey < 27) ||
+            (cellKey >= 45 && cellKey < 54) ||
+            cellKey >= 72
+          ? "2px solid #00b8ff"
+          : "1px solid lightgray",
   };
 
   return (
