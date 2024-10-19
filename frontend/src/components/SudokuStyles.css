@@ -21,8 +21,8 @@
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: repeat(9, 1fr);
-    height: 360px;
-    width: 360px;
+    height: 540px;
+    width: 540px;
     box-shadow: 0 0 0 2px #00b8ff;
     box-sizing: border-box;
 }
@@ -35,8 +35,8 @@
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(1, 1fr);
-    height: 40px;
-    width: 360px;
+    height: 60px;
+    width: 540px;
 
 }
 
@@ -44,14 +44,43 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 40px;
-    width: 40px;
-    font-size: 30px;
+    height: 60px;
+    width: 60px;
+    font-size: 40px;
     box-sizing: border-box;
     margin: 0; /* Ensures no margin between cells */
     padding: 0;
     cursor: pointer;
 }
+
+.notes-cell {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    height: 60px;
+    width: 60px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+.note {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    height: 20px;
+    width: 20px;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 
 .cell-text {
     color: white;

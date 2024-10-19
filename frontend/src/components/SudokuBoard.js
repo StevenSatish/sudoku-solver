@@ -11,6 +11,8 @@ import {
   Button,
   Dialog,
   DialogActions,
+  DialogContent,
+  DialogContentText,
   DialogTitle,
   Divider,
   ListItemButton,
@@ -20,20 +22,30 @@ import {
 } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import { Check, Delete, Lightbulb, Visibility } from "@mui/icons-material";
+import {
+  Check,
+  Delete,
+  Extension,
+  Lightbulb,
+  Visibility,
+} from "@mui/icons-material";
 
 const SudokuBoard = forwardRef(
   ({ puzzle, instanceName, startingCells, fetchPuzzle }, ref) => {
     const [selectedCell, setSelectedCell] = useState(null);
+    const [notesMode, setNotesMode] = useState(false);
     const [confetti, setConfetti] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
     const [errorCells, setErrorCells] = useState(new Set());
+    const [confirmedAction, setConfirmedAction] = useState(null);
     const [board, setBoard] = useState(
       Array.from({ length: 9 }, () => Array(9).fill(0)),
     );
     const [errorOpen, setErrorOpen] = React.useState(false);
     const [victoryOpen, setVictoryOpen] = React.useState(false);
+    const [confirmOpen, setConfirmOpen] = React.useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [confirmMessage, setConfirmMessage] = useState("");
     const countNonZeroCells = (board) => {
       return board.reduce(
         (total, row) => total + row.filter((cell) => cell !== 0).length,
@@ -50,9 +62,22 @@ const SudokuBoard = forwardRef(
         );
       }
     };
+    const handleConfirmOpen = (confirmIndex) => {
+      if (confirmIndex !== undefined && confirmIndex === 0) {
+        setConfirmMessage("You will not be able to return to this puzzle");
+        setConfirmedAction(() => fetchPuzzle); // Pass the function without invoking it
+      } else if (confirmIndex !== undefined && confirmIndex === 1) {
+        setConfirmMessage("You will not be able to regain your progress");
+        setConfirmedAction(() => resetPuzzle); // Pass the function without invoking it
+      }
+      setConfirmOpen(true);
+    };
 
     const handleClose = () => {
       setErrorOpen(false);
+    };
+    const handleConfirmClose = () => {
+      setConfirmOpen(false);
     };
     const handleVictoryOpen = () => {
       setVictoryOpen(true);
@@ -67,6 +92,9 @@ const SudokuBoard = forwardRef(
     };
     const handleVictoryClose = () => {
       setVictoryOpen(false);
+    };
+    const handleNotesModeChange = (event) => {
+      setNotesMode(event.target.checked); // Update state on change
     };
     useImperativeHandle(ref, () => {
       return {
@@ -230,6 +258,7 @@ const SudokuBoard = forwardRef(
     }
 
     function revealPuzzle() {
+      setSelectedCell(null);
       setBoard(JSON.parse(localStorage.getItem("currentSolvedBoard")));
     }
 
@@ -352,11 +381,61 @@ const SudokuBoard = forwardRef(
           </div>
 
           {/* Dialogs */}
-          <Dialog open={errorOpen} onClose={handleClose}>
+          <Dialog
+            sx={{
+              "& .MuiDialog-paper": {
+                backgroundColor: "black", // Black dialog background
+                color: "#FF0099", // White text color
+              },
+            }}
+            open={errorOpen}
+            onClose={handleClose}
+          >
             <DialogTitle id="alert-dialog-title">{errorMessage}</DialogTitle>
             <DialogActions>
-              <Button onClick={handleClose} autoFocus>
+              <Button sx={{ color: "#FF0099" }} onClick={handleClose} autoFocus>
                 Dismiss
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            sx={{
+              "& .MuiDialog-paper": {
+                backgroundColor: "black", // Black dialog background
+                color: "#FF0099", // Pink text color
+              },
+            }}
+            open={confirmOpen}
+            onClose={handleConfirmClose}
+          >
+            <DialogTitle id="alert-dialog-title">Are you sure?</DialogTitle>
+            <DialogContent>
+              <DialogContentText
+                sx={{ color: "#FF0099" }}
+                id="alert-dialog-description"
+              >
+                {confirmMessage}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                sx={{ color: "#FF0099" }}
+                onClick={handleConfirmClose}
+                autoFocus
+              >
+                No
+              </Button>
+              <Button
+                sx={{ color: "#FF0099" }}
+                onClick={() => {
+                  if (confirmedAction) {
+                    confirmedAction();
+                  }
+                  handleConfirmClose();
+                }}
+              >
+                Yes
               </Button>
             </DialogActions>
           </Dialog>
@@ -394,12 +473,34 @@ const SudokuBoard = forwardRef(
             </DialogActions>
           </Dialog>
         </div>
-
+        {instanceName === "Solver" && (
+          <div className="tools-list">
+            <List>
+              <ListItemButton onClick={solveBoard}>
+                <ListItemIcon className={"tool-icons"}>
+                  <Check />
+                </ListItemIcon>
+                <ListItemText primary="Solve" />
+              </ListItemButton>
+            </List>
+          </div>
+        )}
         {instanceName === "Game" && (
           <div className="tools-list">
             <List>
               <ListItem>
-                <Switch />
+                <Switch
+                  checked={notesMode}
+                  onChange={handleNotesModeChange}
+                  sx={{
+                    "& .MuiSwitch-thumb": {
+                      backgroundColor: "white",
+                    },
+                    "& .MuiSwitch-track": {
+                      backgroundColor: "gray",
+                    },
+                  }}
+                />
                 <ListItemText primary="Notes Mode" />
               </ListItem>
               <Divider className={"tool-icon-divider"} />
@@ -429,7 +530,13 @@ const SudokuBoard = forwardRef(
                 <ListItemText primary="Reveal Puzzle" />
               </ListItemButton>
               <Divider className={"tool-icon-divider"} />
-              <ListItemButton onClick={resetPuzzle}>
+              <ListItemButton onClick={() => handleConfirmOpen(0)}>
+                <ListItemIcon className={"tool-icons"}>
+                  <Extension />
+                </ListItemIcon>
+                <ListItemText primary="New Puzzle" />
+              </ListItemButton>
+              <ListItemButton onClick={() => handleConfirmOpen(1)}>
                 <ListItemIcon className={"tool-icons"}>
                   <Delete />
                 </ListItemIcon>
