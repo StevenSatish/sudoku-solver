@@ -36,7 +36,7 @@ function Play() {
     const fetchSudokuPuzzle = async () => {
         try {
             const response = await fetch(
-                "http://sudoku-solver-backend.us-east-2.elasticbeanstalk.com/api/sudoku/generate",
+                "https://sudoku-solver-backend.us-east-2.elasticbeanstalk.com/api/sudoku/generate",
                 {
                     method: "GET",
                     headers: {
@@ -79,7 +79,7 @@ function Play() {
         const requestBody = puzzleData; // Puzzle is the state holding the 2D array
         console.log("Sending fetched board:", requestBody); // Log what you're sending
 
-        fetch("http://sudoku-solver-backend.us-east-2.elasticbeanstalk.com/api/sudoku/solve", {
+        fetch("https://sudoku-solver-backend.us-east-2.elasticbeanstalk.com/api/sudoku/solve", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
