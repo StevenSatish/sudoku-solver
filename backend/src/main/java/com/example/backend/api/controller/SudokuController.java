@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://master.di6ym6l9re7e7.amplifyapp.com")
 @RequestMapping("/api/sudoku")
 public class SudokuController {
 
