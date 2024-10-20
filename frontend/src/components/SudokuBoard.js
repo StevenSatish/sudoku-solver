@@ -176,7 +176,7 @@ const SudokuBoard = forwardRef(
                 if (countNonZeroCells(board) < 22) {
                     handleClickOpen(2);
                 }
-                const response = await fetch("sudoku-solver-backend.us-east-2.elasticbeanstalk.com/api/sudoku/solve", {
+                const response = await fetch("http://sudoku-solver-backend.us-east-2.elasticbeanstalk.com/api/sudoku/solve", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
