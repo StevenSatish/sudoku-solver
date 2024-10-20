@@ -1,0 +1,54 @@
+.about-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+}
+
+.sections-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.rules-section,
+.notes-section,
+.about-me-section {
+
+}
+
+h1,
+h2 {
+    color: #fff;
+}
+
+p,
+li {
+    color: #ccc;
+}
+
+a {
+    color: #00b8ff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Optional: Add specific styling for the notes-section */
+.notes-section ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.notes-section li {
+    margin-bottom: 10px;
+}
+
+.notes-section strong {
+    color: #fff;
+}

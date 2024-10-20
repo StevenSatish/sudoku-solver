@@ -60,10 +60,7 @@ function SideNav({ children }) {
           </ListItem>
           <ListItem key="About" disablePadding>
             <ListItemButton onClick={() => changePage(3)}>
-              <ListItemText
-                primary="About / Tips & Tricks"
-                sx={{ color: "white" }}
-              />
+              <ListItemText primary="About / Rules" sx={{ color: "white" }} />
             </ListItemButton>
           </ListItem>
         </List>

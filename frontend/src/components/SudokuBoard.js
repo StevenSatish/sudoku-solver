@@ -326,6 +326,22 @@ const SudokuBoard = forwardRef(
       setBoard(tempBoard);
     }
 
+    function resetBoard() {
+      // Initialize as before
+      const initialBoard = [];
+      for (let row = 0; row < 9; row++) {
+        const currentRow = [];
+        for (let col = 0; col < 9; col++) {
+          currentRow.push({
+            value: 0,
+            notes: [],
+          });
+        }
+        initialBoard.push(currentRow);
+      }
+      setBoard(initialBoard);
+    }
+
     function revealPuzzle() {
       const solvedBoard = JSON.parse(
         localStorage.getItem("currentSolvedBoard"),
@@ -574,6 +590,13 @@ const SudokuBoard = forwardRef(
         {instanceName === "Solver" && (
           <div className="tools-list">
             <List>
+              <ListItemButton onClick={resetBoard}>
+                <ListItemIcon className={"tool-icons"}>
+                  <Delete />
+                </ListItemIcon>
+                <ListItemText primary="Reset Board" />
+              </ListItemButton>
+              <Divider className={"tool-icon-divider"} />
               <ListItemButton onClick={solveBoard}>
                 <ListItemIcon className={"tool-icons"}>
                   <Check />
