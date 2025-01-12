@@ -11,7 +11,7 @@
 ## Installation
 1. Clone the repository:
 ```
-git clone https://github.com/yourusername/sudoku-solver
+git clone https://github.com/StevenSatish/sudoku-solver
 cd sudoku-solver
 ```
 2. Backend Setup:
