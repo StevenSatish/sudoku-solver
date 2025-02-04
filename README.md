@@ -4,7 +4,7 @@
 - Play Page: Access up to 9,000 unique 9x9 Sudoku puzzles with tools for cell checking, note-taking, and solution reveals.
 - Solver Page: Input any 9x9 puzzle to receive an instant solution, using backend algorithms to solve the puzzle.
 - About Page: Provides Sudoku rules, gameplay tips, and an "About Me" section to learn more about the developer.
-# 🚀 Getting Started
+# Getting Started Locally
 ## Prerequisites
 - Java and Maven for backend setup
 - Node.js and npm for frontend setup
